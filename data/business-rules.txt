@@ -1,0 +1,14 @@
+- Store money as integer cents.
+- term_days = term_end - term_start.
+- remaining_days = term_end - effective_date.
+- delta_cents = round_half_away_from_0(
+    (new_annual_premium_cents - old_annual_premium_cents)
+    * remaining_days / term_days
+  ).
+- Positive premium delta: DR Premium Receivable / CR Written Premium.
+- Negative premium delta: DR Written Premium / CR Premium Receivable.
+- Payment received: DR Cash / CR Premium Receivable.
+- Same idempotency key + same payload: return the original result with no new financial effects.
+- Same idempotency key + different payload: fail with HTTP 409.
+- Wrong-currency payment: fail atomically.
+- Each policy-event hash includes the canonical payload and previous_hash.
