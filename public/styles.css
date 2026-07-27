@@ -1,0 +1,104 @@
+:root {
+  color-scheme: light;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f4f6f8;
+  color: #17212b;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; }
+button, input, textarea { font: inherit; }
+button { cursor: pointer; }
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 2.25rem max(1.5rem, calc((100vw - 1180px) / 2));
+  background: #113f32;
+  color: white;
+}
+
+.page-header h1 { margin: 0.25rem 0 0.5rem; font-size: clamp(2rem, 4vw, 3rem); }
+.page-header p { margin: 0; max-width: 760px; }
+main { width: min(1180px, calc(100% - 2rem)); margin: 2rem auto 4rem; }
+
+.panel {
+  background: white;
+  border: 1px solid #dce2e8;
+  border-radius: 14px;
+  padding: 1.25rem;
+  box-shadow: 0 8px 24px rgba(20, 37, 52, 0.06);
+}
+
+.policy-loader { display: flex; align-items: end; gap: 1rem; margin-bottom: 1rem; }
+.policy-loader > div { flex: 1; }
+.hidden { display: none !important; }
+
+label { display: grid; gap: 0.4rem; font-weight: 650; font-size: 0.92rem; }
+input, textarea {
+  width: 100%;
+  border: 1px solid #bfc9d3;
+  border-radius: 8px;
+  padding: 0.72rem 0.78rem;
+  color: #17212b;
+  background: white;
+}
+input:focus, textarea:focus { outline: 3px solid rgba(24, 117, 84, 0.18); border-color: #187554; }
+
+button, .secondary-button {
+  border: 0;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  background: #187554;
+  color: white;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+button:hover, .secondary-button:hover { filter: brightness(0.94); }
+.secondary-button { background: transparent; border: 1px solid rgba(255,255,255,0.55); }
+
+.form-grid, .details-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-top: 1rem; }
+form { display: grid; gap: 0.9rem; }
+.section-heading { display: flex; align-items: start; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+h2 { margin: 0; }
+.eyebrow { margin: 0 0 0.25rem; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.72rem; font-weight: 800; color: #43806a; }
+.page-header .eyebrow { color: #a9d9c6; }
+
+.summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.75rem; }
+.summary-item { padding: 0.9rem; border-radius: 10px; background: #f5f8f7; }
+.summary-item span { display: block; color: #61707d; font-size: 0.78rem; margin-bottom: 0.25rem; }
+.summary-item strong { font-size: 1.05rem; overflow-wrap: anywhere; }
+.plain-summary { line-height: 1.55; margin-bottom: 0.5rem; }
+.suggested-action { margin: 0; font-weight: 750; color: #154e3b; }
+
+.badge { display: inline-flex; border-radius: 999px; padding: 0.35rem 0.65rem; font-size: 0.78rem; font-weight: 800; }
+.badge.valid { background: #dff4e9; color: #17663f; }
+.badge.invalid { background: #fee5e2; color: #9e2e26; }
+.status { min-height: 1.25rem; font-size: 0.9rem; }
+.status.loading { color: #465766; }
+.status.success { color: #17663f; }
+.status.error { color: #a12720; }
+.helper-text { margin: -0.2rem 0 0; font-size: 0.82rem; color: #61707d; }
+.form-result { min-height: 1.4rem; font-size: 0.88rem; line-height: 1.45; }
+.form-result.success { color: #17663f; }
+.form-result.error { color: #a12720; }
+
+.timeline { display: grid; gap: 0.7rem; }
+.timeline-item { border-left: 3px solid #9ab7ab; padding: 0.55rem 0.75rem; background: #f8faf9; }
+.timeline-item strong { display: block; }
+.timeline-item small { color: #667580; }
+.ledger-transaction { border: 1px solid #dce2e8; border-radius: 10px; padding: 0.8rem; margin-top: 0.75rem; }
+.ledger-transaction header { display: flex; justify-content: space-between; gap: 1rem; }
+.ledger-transaction ul { margin: 0.65rem 0 0; padding-left: 1.15rem; }
+
+pre { overflow: auto; background: #101923; color: #eaf2f7; padding: 1rem; border-radius: 10px; font-size: 0.82rem; }
+#raw-response-panel { margin-top: 1rem; }
+
+@media (max-width: 850px) {
+  .page-header { align-items: flex-start; flex-direction: column; }
+  .form-grid, .details-grid, .summary-grid { grid-template-columns: 1fr; }
+  .policy-loader { align-items: stretch; flex-direction: column; }
+}

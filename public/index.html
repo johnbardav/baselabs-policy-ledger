@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Policy Operations Console</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Base Labs take-home assessment</p>
+        <h1>Policy Operations Console</h1>
+        <p>Apply endorsements, record received-payment data, and inspect financial and audit state.</p>
+      </div>
+      <a class="secondary-button" href="/docs" target="_blank" rel="noreferrer">Open API docs</a>
+    </header>
+
+    <main>
+      <section class="panel policy-loader">
+        <div>
+          <label for="policy-id">Policy ID</label>
+          <input id="policy-id" value="POL-1001" autocomplete="off" />
+        </div>
+        <button id="load-policy" type="button">Load policy</button>
+        <span id="global-status" class="status" aria-live="polite"></span>
+      </section>
+
+      <section id="policy-summary" class="panel hidden" aria-live="polite">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Current state</p>
+            <h2 id="summary-title">Policy</h2>
+          </div>
+          <span id="history-badge" class="badge"></span>
+        </div>
+        <div id="summary-grid" class="summary-grid"></div>
+        <p id="plain-summary" class="plain-summary"></p>
+        <p id="suggested-action" class="suggested-action"></p>
+      </section>
+
+      <div class="form-grid">
+        <section class="panel">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Financial mutation</p>
+              <h2>Apply endorsement</h2>
+            </div>
+          </div>
+          <form id="endorsement-form">
+            <label>
+              Idempotency key
+              <input name="idempotency_key" value="END-2001" required />
+            </label>
+            <label>
+              Effective date
+              <input name="effective_date" type="date" value="2026-07-01" required />
+            </label>
+            <label>
+              New annual premium (cents)
+              <input name="new_annual_premium_cents" type="number" min="0" step="1" value="144000" required />
+            </label>
+            <label>
+              Reason
+              <textarea name="reason" rows="3" required>Water-shutoff discount removed</textarea>
+            </label>
+            <button type="submit">Apply endorsement</button>
+            <div id="endorsement-result" class="form-result" aria-live="polite"></div>
+          </form>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Data ingestion only</p>
+              <h2>Record received payment</h2>
+            </div>
+          </div>
+          <form id="payment-form">
+            <label>
+              Idempotency key
+              <input name="idempotency_key" value="PAY-9001" required />
+            </label>
+            <label>
+              External payment ID
+              <input name="external_payment_id" value="PAY-9001" required />
+            </label>
+            <label>
+              Amount (cents)
+              <input name="amount_cents" type="number" min="1" step="1" value="12099" required />
+            </label>
+            <label>
+              Currency
+              <input name="currency" value="USD" minlength="3" maxlength="3" required />
+            </label>
+            <label>
+              Received at
+              <input name="received_at" value="2026-07-03T18:30:00Z" required />
+            </label>
+            <p class="helper-text">This form never asks for card or bank credentials.</p>
+            <button type="submit">Record payment data</button>
+            <div id="payment-result" class="form-result" aria-live="polite"></div>
+          </form>
+        </section>
+      </div>
+
+      <section id="details" class="details-grid hidden">
+        <article class="panel">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Audit trail</p>
+              <h2>Timeline</h2>
+            </div>
+          </div>
+          <div id="timeline" class="timeline"></div>
+        </article>
+
+        <article class="panel">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Double-entry accounting</p>
+              <h2>Ledger</h2>
+            </div>
+          </div>
+          <div id="ledger-summary"></div>
+        </article>
+      </section>
+
+      <section id="raw-response-panel" class="panel hidden">
+        <details>
+          <summary>Latest API response</summary>
+          <pre id="raw-response"></pre>
+        </details>
+      </section>
+    </main>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>
