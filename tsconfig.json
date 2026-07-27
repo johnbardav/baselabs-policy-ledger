@@ -9,6 +9,7 @@
     "target": "ES2022",
     "sourceMap": true,
     "outDir": "./dist",
+    "rootDir": "./src",
     "baseUrl": "./",
     "incremental": true,
     "strict": true,
@@ -16,7 +17,8 @@
     "noImplicitOverride": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "noEmitOnError": true
+    "noEmitOnError": true,
+    "ignoreDeprecations": "6.0"
   },
   "include": [
     "src/**/*.ts"
