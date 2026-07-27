@@ -1,0 +1,83 @@
+@baseUrl = http://localhost:3000/api
+@policyId = POL-1001
+
+### Health
+GET {{baseUrl}}/health
+
+### Apply endorsement
+POST {{baseUrl}}/policies/{{policyId}}/endorsements
+Content-Type: application/json
+Idempotency-Key: END-2001
+
+{
+  "effective_date": "2026-07-01",
+  "new_annual_premium_cents": 144000,
+  "reason": "Water-shutoff discount removed"
+}
+
+### Replay exact endorsement
+POST {{baseUrl}}/policies/{{policyId}}/endorsements
+Content-Type: application/json
+Idempotency-Key: END-2001
+
+{
+  "effective_date": "2026-07-01",
+  "new_annual_premium_cents": 144000,
+  "reason": "Water-shutoff discount removed"
+}
+
+### Conflict: same key, different payload
+POST {{baseUrl}}/policies/{{policyId}}/endorsements
+Content-Type: application/json
+Idempotency-Key: END-2001
+
+{
+  "effective_date": "2026-07-01",
+  "new_annual_premium_cents": 145000,
+  "reason": "Conflicting retry"
+}
+
+### Record received payment data
+POST {{baseUrl}}/policies/{{policyId}}/payments
+Content-Type: application/json
+Idempotency-Key: PAY-9001
+
+{
+  "external_payment_id": "PAY-9001",
+  "amount_cents": 12099,
+  "currency": "USD",
+  "received_at": "2026-07-03T18:30:00Z"
+}
+
+### Replay exact payment delivery
+POST {{baseUrl}}/policies/{{policyId}}/payments
+Content-Type: application/json
+Idempotency-Key: PAY-9001
+
+{
+  "external_payment_id": "PAY-9001",
+  "amount_cents": 12099,
+  "currency": "USD",
+  "received_at": "2026-07-03T18:30:00Z"
+}
+
+### Reject wrong currency atomically
+POST {{baseUrl}}/policies/{{policyId}}/payments
+Content-Type: application/json
+Idempotency-Key: PAY-9002
+
+{
+  "external_payment_id": "PAY-9002",
+  "amount_cents": 5000,
+  "currency": "EUR",
+  "received_at": "2026-07-04T10:00:00Z"
+}
+
+### Policy state
+GET {{baseUrl}}/policies/{{policyId}}
+
+### Ledger proof
+GET {{baseUrl}}/policies/{{policyId}}/ledger
+
+### Verify policy history
+GET {{baseUrl}}/policies/{{policyId}}/history/verify
