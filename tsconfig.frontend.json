@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "none",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "strict": true,
+    "skipLibCheck": true,
+    "outFile": "public/app.js",
+    "noEmitOnError": true
+  },
+  "include": [
+    "frontend/app.ts"
+  ]
+}

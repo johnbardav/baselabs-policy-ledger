@@ -1,0 +1,52 @@
+{
+  "name": "baselabs-policy-ledger",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Backend-heavy Policy Administration System take-home assessment using NestJS, TypeScript, PostgreSQL, and raw SQL.",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build:frontend": "tsc -p tsconfig.frontend.json",
+    "build:api": "nest build",
+    "build": "npm run build:frontend && npm run build:api",
+    "start": "node dist/main.js",
+    "start:dev": "npm run build:frontend && nest start --watch",
+    "start:prod": "node dist/main.js",
+    "db:migrate": "node scripts/migrate.mjs",
+    "db:seed": "node scripts/seed.mjs",
+    "db:setup": "npm run db:migrate && npm run db:seed",
+    "demo": "node scripts/demo.mjs",
+    "test": "jest --runInBand test/unit",
+    "test:integration": "jest --config test/jest-e2e.json --runInBand",
+    "test:all": "npm run test && npm run test:integration",
+    "verify": "node scripts/verify-project.mjs"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/config": "^4.0.0",
+    "@nestjs/core": "^11.0.0",
+    "@nestjs/platform-express": "^11.0.0",
+    "@nestjs/swagger": "^11.0.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
+    "helmet": "^8.0.0",
+    "pg": "^8.13.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.0",
+    "@nestjs/testing": "^11.0.0",
+    "@types/express": "^5.0.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.0.0",
+    "@types/pg": "^8.11.10",
+    "@types/supertest": "^6.0.2",
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.2.5",
+    "typescript": "^5.8.0"
+  }
+}
