@@ -1,37 +1,78 @@
 # Base Labs Policy Ledger
 
-A backend-heavy Policy Administration System slice built with **NestJS**, **TypeScript**, **PostgreSQL**, and **raw SQL only**. It applies mid-term endorsements, ingests payment data already processed by another system, posts balanced double-entry ledger effects, and maintains a tamper-evident append-only policy history.
+A backend-heavy Policy Administration System slice built with NestJS, TypeScript, PostgreSQL, and raw SQL.
 
-## What is included
+The application applies mid-term policy endorsements, calculates deterministic premium proration, records received-payment data, creates balanced double-entry accounting effects, and maintains an append-only tamper-evident policy history.
 
-- Required REST endpoints under `/api/policies/:policyId`
-- Deterministic proration using integer arithmetic and half-away-from-zero rounding
-- Transactional idempotency for endorsements and payment ingestion
-- Raw SQL migrations with database-enforced ledger balance and append-only guards
-- Minimal operator UI served by the NestJS application
+## Main features
+
+- NestJS REST API
+- TypeScript
+- PostgreSQL
+- Raw SQL migrations
+- No ORM or query builder
+- Integer-cent financial calculations
+- Deterministic half-away-from-zero rounding
+- Transactional idempotency
+- Double-entry ledger
+- Append-only hash-chained policy history
+- Minimal operator frontend
 - Swagger/OpenAPI documentation
 - Unit and PostgreSQL integration tests
-- Docker Compose for the application, development database, and test database
-- Sample assessment data and an automated demo script
-- Installation, run, architecture, testing, deployment, on-call, AI-usage, commit, and interview notes
+- Docker Compose environment
 
-## Fastest start on Windows 11
+## Requirements
+
+For the Docker execution path:
+
+- Git
+- Docker Desktop
+- Docker Compose
+
+For local Node.js development:
+
+- Node.js 20 or newer
+- Node.js 22 recommended
+- npm
+
+## Quick start
+
+Clone the repository:
 
 ```powershell
-Copy-Item .env.example .env
-docker compose up --build
+git clone https://github.com/johnbardav/baselabs-policy-ledger.git
+Set-Location .\baselabs-policy-ledger
+```
+
+Create the local environment file:
+
+```powershell
+Copy-Item .\.env.example .\.env
+```
+
+Start the complete environment:
+
+```powershell
+docker compose up --build -d
+```
+
+Check service status:
+
+```powershell
+docker compose ps
 ```
 
 Open:
 
 - Operator UI: `http://localhost:3000`
 - Swagger UI: `http://localhost:3000/docs`
-- Health check: `http://localhost:3000/api/health`
+- OpenAPI JSON: `http://localhost:3000/docs-json`
+- Health endpoint: `http://localhost:3000/api/health`
 
-Run the supplied scenario in another PowerShell terminal:
+Run the sample scenario:
 
 ```powershell
-./scripts/demo.ps1
+npm.cmd run demo
 ```
 
 Stop the environment:
@@ -40,44 +81,182 @@ Stop the environment:
 docker compose down
 ```
 
-Remove the database volume and reset all local data:
+Reset all local database data:
 
 ```powershell
 docker compose down -v
 ```
 
-## Documentation
+## Required API endpoints
 
-- [Installation](docs/INSTALL.md)
-- [Run and configuration](docs/RUN.md)
-- [Assessment coverage checklist](docs/ASSESSMENT_CHECKLIST.md)
-- [Architecture and decisions](docs/ARCHITECTURE.md)
-- [API examples and error behavior](docs/API.md)
-- [Testing](docs/TESTING.md)
-- [Deployment](docs/DEPLOYMENT.md)
-- [On-call monitoring and recovery](docs/ON_CALL.md)
-- [AI usage and manual verification](docs/AI_USAGE.md)
-- [Thirty-minute commit plan](docs/COMMIT_PLAN.md)
-- [Interview walkthrough](docs/INTERVIEW_WALKTHROUGH.md)
-- [Submission checklist](docs/SUBMISSION_CHECKLIST.md)
+```text
+POST /api/policies/:policyId/endorsements
+POST /api/policies/:policyId/payments
+GET  /api/policies/:policyId
+GET  /api/policies/:policyId/ledger
+GET  /api/policies/:policyId/history/verify
+GET  /api/health
+```
 
-## Core business rules
+Mutation endpoints accept the idempotency key through the `Idempotency-Key` header or the `idempotency_key` JSON property.
+
+An exact replay returns the original result without creating duplicate financial effects.
+
+Reusing the same key with a different payload returns HTTP 409.
+
+## Proration rule
+
+Money is represented as integer cents.
 
 ```text
 term_days = term_end - term_start
 remaining_days = term_end - effective_date
-prorated_delta_cents = round_half_away_from_zero(
+
+delta_cents = round_half_away_from_zero(
   (new_annual_premium_cents - old_annual_premium_cents)
-  * remaining_days / term_days
+  * remaining_days
+  / term_days
 )
 ```
 
-All money is stored as integer cents. No ORM is used. Every financial mutation is wrapped in one PostgreSQL transaction, and the database rejects unbalanced ledger transactions at commit time.
+The implementation uses `BigInt` for intermediate multiplication and division.
 
-## Assessment sample result
+For the supplied example:
 
-For `POL-1001`, changing the annual premium from `120000` to `144000` cents effective `2026-07-01` produces a prorated adjustment of `12099` cents. Recording the supplied `12099`-cent USD payment reduces the open balance to zero.
+```text
+old annual premium: 120000 cents
+new annual premium: 144000 cents
+effective date: 2026-07-01
+term: 2026-01-01 to 2027-01-01
+prorated adjustment: 12099 cents
+```
 
-## Scope boundary
+## Accounting rules
 
-The payment endpoint only receives and persists normalized JSON describing a payment that already happened elsewhere. It does not call Stripe, PayPal, a bank, or any payment gateway, and it never captures card or bank credentials.
+Positive endorsement adjustment:
+
+```text
+DR PREMIUM_RECEIVABLE
+CR WRITTEN_PREMIUM
+```
+
+Negative endorsement adjustment:
+
+```text
+DR WRITTEN_PREMIUM
+CR PREMIUM_RECEIVABLE
+```
+
+Received payment:
+
+```text
+DR CASH
+CR PREMIUM_RECEIVABLE
+```
+
+Every financial mutation runs inside one PostgreSQL transaction.
+
+Deferred database triggers reject unbalanced ledger transactions at commit time.
+
+## Policy history
+
+Policy events are append-only.
+
+Each event includes:
+
+- canonical JSON payload
+- sequence number
+- previous hash
+- event hash
+
+The event hash is calculated from the previous hash and canonical payload.
+
+Database triggers prevent updates and deletions of policy events and ledger records.
+
+## Payment boundary
+
+The payment endpoint only receives normalized JSON describing a payment that already occurred outside this system.
+
+The application does not:
+
+- contact Stripe or PayPal
+- contact a bank
+- authorize payments
+- capture payments
+- settle payments
+- issue refunds
+- collect card numbers
+- collect bank credentials
+
+## Tests
+
+Install the exact dependency tree:
+
+```powershell
+npm.cmd ci
+```
+
+Run project verification:
+
+```powershell
+npm.cmd run verify
+```
+
+Build the frontend and backend:
+
+```powershell
+npm.cmd run build
+```
+
+Run unit tests:
+
+```powershell
+npm.cmd test
+```
+
+Run integration tests:
+
+```powershell
+docker compose --profile test up -d db-test
+npm.cmd run test:integration
+docker compose --profile test down
+```
+
+## Error handling
+
+The API rejects:
+
+- malformed JSON
+- unknown fields
+- missing idempotency keys
+- invalid dates
+- inactive or missing policies
+- conflicting idempotency payloads
+- wrong payment currencies
+- invalid monetary values
+
+Expected failures return structured JSON errors.
+
+Unexpected failures return HTTP 500 without exposing internal stack traces.
+
+## Documentation
+
+- [Installation](docs/INSTALL.md)
+- [Run and configuration](docs/RUN.md)
+- [Deployment and operations](docs/DEPLOYMENT.md)
+
+## AI assistance
+
+AI tools were used to assist with initial scaffolding, test ideas, documentation review, and configuration troubleshooting.
+
+The SQL, transaction boundaries, proration arithmetic, idempotency behavior, ledger postings, history verification, and failure paths were reviewed and tested manually.
+
+## Improvements with more time
+
+- explicit payment allocation records
+- compensating-entry and reversal workflows
+- authentication and authorization
+- structured logging and metrics
+- pagination for long policy histories
+- dedicated production migration jobs
+- expanded observability dashboards
