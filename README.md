@@ -62,6 +62,8 @@ Check service status:
 docker compose ps
 ```
 
+Wait until the `db` and `api` services report a healthy state.
+
 Open:
 
 - Operator UI: `http://localhost:3000`
@@ -218,6 +220,7 @@ Run integration tests:
 
 ```powershell
 docker compose --profile test up -d db-test
+docker compose --profile test ps
 npm.cmd run test:integration
 docker compose --profile test down
 ```
@@ -243,6 +246,7 @@ Unexpected failures return HTTP 500 without exposing internal stack traces.
 
 - [Installation](docs/INSTALL.md)
 - [Run and configuration](docs/RUN.md)
+- [Architecture and design decisions](docs/ARCHITECTURE.md)
 - [Deployment and operations](docs/DEPLOYMENT.md)
 
 ## AI assistance
